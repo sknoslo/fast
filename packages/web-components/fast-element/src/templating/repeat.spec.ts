@@ -235,7 +235,7 @@ describe("The repeat", () => {
             });
         });
 
-        oneThroughTen.forEach(size => {
+    oneThroughTen.forEach(size => {
             it(`updates rendered HTML when a single item is replaced from the beginning of an array of size ${size}`, async () => {
                 const { parent, targets, nodeId } = createLocation();
                 const directive = repeat<ViewModel>(
@@ -254,6 +254,32 @@ describe("The repeat", () => {
 
                 expect(toHTML(parent)).to.equal(
                     `newitem1newitem2${createOutput(size, x => x !== 0)}`
+                );
+            });
+        });
+
+        oneThroughTen.forEach(size => {
+            it(`updates rendered HTML when there's an in-place update of array of size ${size}
+            `, async () => {
+                const { parent, targets, nodeId } = createLocation();
+                const directive = repeat<ViewModel>(
+                    x => x.items,
+                    itemTemplate
+                ) as RepeatDirective;
+                directive.nodeId = nodeId;
+                const behavior = directive.createBehavior(targets);
+                const vm = new ViewModel(size);
+
+                behavior.bind(vm, ExecutionContext.default);
+
+                const index = size - 1;
+
+                // in place update
+                vm.items.splice(index, 1, vm.items[index]);
+                await Updates.next();
+
+                expect(toHTML(parent)).to.equal(
+                    `${createOutput(size)}`
                 );
             });
         });
