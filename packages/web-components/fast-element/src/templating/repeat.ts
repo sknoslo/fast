@@ -229,7 +229,9 @@ export class RepeatBehavior<TSource = any> implements Behavior, Subscriber {
                 bindView(view, items, addIndex, childContext);
 
                 // chcek if view already exists at location
-                if (!location.isEqualNode(view.lastChild)) view.insertBefore(location);
+                if (!location?.previousSibling?.isEqualNode(view.lastChild)) {
+                    view.insertBefore(location);
+                }
             }
         }
 
